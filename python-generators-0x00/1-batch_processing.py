@@ -36,23 +36,15 @@ def stream_users_in_batches(batch_size):
 
 def batch_processing(batch_size):
     """Process batches to filter users over age 25"""
-    # First loop: stream batches from database
     for batch in stream_users_in_batches(batch_size):
         if batch is None:
             continue
-            
-        # Second loop: process each user in batch
-        filtered_users = []
-        for user in batch:  # This is the only inner loop
-            if user['age'] > 25:
-                filtered_users.append(user)
-        
-        # Yield filtered results
+        filtered_users = [user for user in batch if user['age'] > 25]
         yield filtered_users
+    return  # Optional to satisfy linters expecting a return
 
 # Example usage
 if __name__ == "__main__":
-    # Third loop: process and display results (only in main execution)
     for filtered_batch in batch_processing(10):  # Process in batches of 10
         for user in filtered_batch:
             print(f"User over 25: {user['name']} (Age: {user['age']})")
