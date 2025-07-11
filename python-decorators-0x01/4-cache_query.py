@@ -9,7 +9,6 @@ def cache_query(func):
     def wrapper(conn, *args, **kwargs):
         query = kwargs.get("query") or (args[0] if args else None)
         if query in query_cache:
-            print("🧠 Returning cached result.")
             return query_cache[query]
         result = func(conn, *args, **kwargs)
         query_cache[query] = result
