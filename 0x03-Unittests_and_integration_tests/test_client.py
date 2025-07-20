@@ -23,8 +23,8 @@ class TestGithubOrgClient(unittest.TestCase):
         # Create client instance
         client = GithubOrgClient(org_name)
         
-        # Call the org method (should use get_json)
-        result = client.org()
+        # Call the org property (should use get_json)
+        result = client.org
 
         # Verify get_json was called exactly once with expected URL
         expected_url = f"https://api.github.com/orgs/{org_name}"
@@ -32,6 +32,6 @@ class TestGithubOrgClient(unittest.TestCase):
         self.assertEqual(result, test_payload)
 
         # Verify memoization - second call should not call get_json again
-        result2 = client.org()
+        result2 = client.org
         self.assertEqual(mock_get_json.call_count, 1)
         self.assertEqual(result2, test_payload)
