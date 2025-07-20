@@ -2,7 +2,7 @@
 """Test module for client.GithubOrgClient"""
 import unittest
 from parameterized import parameterized
-from unittest.mock import patch, Mock
+from unittest.mock import patch, PropertyMock
 from client import GithubOrgClient
 
 
@@ -16,24 +16,22 @@ class TestGithubOrgClient(unittest.TestCase):
     @patch('client.get_json')
     def test_org(self, org_name, mock_get_json):
         """Test that GithubOrgClient.org returns correct value"""
-        # Setup expected return value
+        # Setup test payload
         test_payload = {"name": org_name, "repos_url": f"https://api.github.com/orgs/{org_name}/repos"}
         mock_get_json.return_value = test_payload
 
         # Create client instance
         client = GithubOrgClient(org_name)
-
-        # Call the method
+        
+        # Call the org method (should use get_json)
         result = client.org()
 
         # Verify get_json was called exactly once with expected URL
         expected_url = f"https://api.github.com/orgs/{org_name}"
         mock_get_json.assert_called_once_with(expected_url)
-
-        # Verify the result matches expected payload
         self.assertEqual(result, test_payload)
 
-        # Verify subsequent call uses memoized result (not calling get_json again)
+        # Verify memoization - second call should not call get_json again
         result2 = client.org()
-        mock_get_json.assert_called_once()  # Still only called once
+        self.assertEqual(mock_get_json.call_count, 1)
         self.assertEqual(result2, test_payload)
