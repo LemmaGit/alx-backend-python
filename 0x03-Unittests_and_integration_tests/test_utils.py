@@ -83,10 +83,14 @@ class TestMemoize(unittest.TestCase):
         with patch.object(test_instance, 'a_method') as mock_method:
             mock_method.return_value = 42
             
+            # First call - should call a_method
             result1 = test_instance.a_property
+            # Second call - should use cached result
             result2 = test_instance.a_property
             
+            # Both calls should return 42
             self.assertEqual(result1, 42)
             self.assertEqual(result2, 42)
             
+            # a_method should only be called once
             mock_method.assert_called_once()
