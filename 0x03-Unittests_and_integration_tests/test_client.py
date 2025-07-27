@@ -92,3 +92,7 @@ class TestGithubOrgClient(unittest.TestCase):
                 client = GithubOrgClient("test")
                 result = client.public_repos(license="mit")
                 self.assertEqual(result, ["repo1"])
+
+if __name__ == "__main__":
+    unittest.main()
+    
