@@ -2,6 +2,8 @@ from rest_framework import viewsets, permissions, status, filters
 from rest_framework.response import Response
 from .models import Conversation, Message
 from .serializers import ConversationSerializer, MessageSerializer
+from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwner
 
 class ConversationViewSet(viewsets.ModelViewSet):
     queryset = Conversation.objects.all()
@@ -19,11 +21,8 @@ class ConversationViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MessageSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ['sent_at']
-    ordering = ['-sent_at']
+    permission_classes = [IsAuthenticated, IsOwner]
 
-    def perform_create(self, serializer):
-        serializer.save(sender=self.request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    def get_queryset(self):
+        # Return only messages owned by the current user
+        return Message.objects.filter(user=self.request.user)
