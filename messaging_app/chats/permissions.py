@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 from rest_framework import permissions
 
 class IsOwner(BasePermission):
@@ -12,15 +12,19 @@ class IsOwner(BasePermission):
 
 class IsParticipantOfConversation(BasePermission):
     """
-    Allow access only to authenticated users who are participants
-    of the conversation related to the message or conversation object.
+    Allow only participants of a conversation to view/edit messages.
     """
 
     def has_permission(self, request, view):
-        # Allow only authenticated users
-        return bool(request.user and request.user.is_authenticated)
+        return request.user and request.user.is_authenticated
 
     def has_object_permission(self, request, view, obj):
-        # Check if the user is a participant in the conversation
-        # Adjust 'participants' or related field based on your models
-        return request.user in obj.conversation.participants.all()
+        # For read-only methods (GET, HEAD, OPTIONS)
+        if request.method in SAFE_METHODS:
+            return request.user in obj.conversation.participants.all()
+        
+        # For write methods (PUT, PATCH, DELETE)
+        if request.method in ['PUT', 'PATCH', 'DELETE']:
+            return request.user in obj.conversation.participants.all()
+
+        return False
