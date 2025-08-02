@@ -1,4 +1,5 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated
+from rest_framework import permissions
 
 class IsOwner(BasePermission):
     """
@@ -6,5 +7,7 @@ class IsOwner(BasePermission):
     """
 
     def has_object_permission(self, request, view, obj):
-        # Adjust 'user' to your model's field, e.g., obj.owner or obj.sender
-        return obj.user == request.user
+        return obj.user == request.user  # Adjust if needed
+    def has_permission(self, request, view):
+        # Allow access only if the user is authenticated
+        return request.user and request.user.is_authenticated
