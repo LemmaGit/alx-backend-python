@@ -7,8 +7,7 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Include your app's routes
-    path('api/', include('messaging_app.chats.urls')),
+    path('api/', include('chats.urls')),
     path('admin/', admin.site.urls),
-     path('api/', include('chats.urls')),
-      path('api-auth/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
