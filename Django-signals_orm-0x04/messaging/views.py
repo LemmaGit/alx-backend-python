@@ -4,11 +4,19 @@ from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 from .models import Message
 from django.shortcuts import render
+from django.views.decorators.cache import cache_page
+
 @login_required
 @require_POST
 def delete_user(request):
     request.user.delete()
     return redirect('home')
+
+@cache_page(60) 
+@login_required
+def conversation_view(request):
+    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+    return render(request, 'chats/conversation.html', {'messages': messages})
 
 @login_required
 def user_conversations(request):
