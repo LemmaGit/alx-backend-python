@@ -2,9 +2,23 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
-
+from .models import Message
+from django.shortcuts import render
 @login_required
 @require_POST
 def delete_user(request):
     request.user.delete()
     return redirect('home')
+
+@login_required
+def user_conversations(request):
+    messages = Message.objects.filter(
+        sender=request.user
+    ).select_related('receiver', 'parent_message') \
+     | Message.objects.filter(
+        receiver=request.user
+    ).select_related('sender', 'parent_message')
+
+    messages = messages.prefetch_related('replies').order_by('-timestamp')
+
+    return render(request, 'messaging/conversations.html', {'messages': messages})

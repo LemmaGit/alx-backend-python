@@ -7,6 +7,17 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     edited = models.BooleanField(default=False)
+    parent_message = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='replies')
+
+    def get_all_replies(self):
+        replies = []
+        def fetch_children(msg):
+            children = msg.replies.all()
+            for child in children:
+                replies.append(child)
+                fetch_children(child)
+        fetch_children(self)
+        return replies
     
 
 class Notification(models.Model):
