@@ -22,3 +22,8 @@ def user_conversations(request):
     messages = messages.prefetch_related('replies').order_by('-timestamp')
 
     return render(request, 'messaging/conversations.html', {'messages': messages})
+
+@login_required
+def unread_inbox(request):
+    unread_messages = Message.unread.unread_for_user(request.user)
+    return render(request, 'messaging/unread_inbox.html', {'messages': unread_messages})
